@@ -59,7 +59,7 @@ graph TD
     subgraph Database [CognoDB Cloud]
         C0[CognoDB Free c0 Instance]
         Bolt[Bolt 5.4 Protocol]
-        GraphData[39 Stations | 6 Lines | 84 Connections]
+        GraphData["39 Stations | 6 Lines | 84 Connections"]
     end
 
     RF --> API
