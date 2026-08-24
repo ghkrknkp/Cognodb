@@ -9,7 +9,10 @@ import type {
   HealthStatus,
 } from './types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const rawBase =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? 'http://localhost:8000' : 'https://cognodb-n8cr.onrender.com');
+const API_BASE = rawBase.replace(/\/+$/, '');
 
 export interface QueryLog {
   title: string;
