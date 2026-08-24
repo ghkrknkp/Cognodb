@@ -2,6 +2,11 @@
 > Built for the **WEXA AI Take-Home Assignment**  
 > Powered by **CognoDB Cloud** (openCypher over Bolt 5.x) + **FastAPI (Python)** + **React & TypeScript (Vite)**
 
+🔗 **Live Deployments**:
+- **Frontend (Vercel)**: [https://cognodb-hazel.vercel.app/](https://cognodb-hazel.vercel.app/)
+- **Backend API (Render)**: [https://cognodb-n8cr.onrender.com/docs](https://cognodb-n8cr.onrender.com/docs)
+- **API Health**: [https://cognodb-n8cr.onrender.com/health](https://cognodb-n8cr.onrender.com/health)
+
 ---
 
 ## 📌 1. Use Case & "Why a Graph Database?"
