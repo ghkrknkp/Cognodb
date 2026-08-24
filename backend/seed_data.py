@@ -477,6 +477,29 @@ def load_connections(tx, connections):
         )
 
 
+def run_seed(driver):
+    with driver.session() as session:
+        session.execute_write(create_constraints)
+        session.execute_write(load_stations, STATIONS)
+        session.execute_write(load_lines, LINES)
+        session.execute_write(load_line_stops, LINE_STOPS)
+        session.execute_write(load_connections, CONNECTIONS)
+
+        res = session.run(
+            """
+            MATCH (s:Station) WITH count(s) AS st
+            MATCH (l:Line)    WITH st, count(l) AS li
+            MATCH ()-[r:CONNECTED_TO]->() WITH st, li, count(r) AS co
+            RETURN st, li, co
+            """
+        ).single()
+        return {
+            "stations": res["st"] if res else 0,
+            "lines": res["li"] if res else 0,
+            "connections": res["co"] if res else 0,
+        }
+
+
 def main():
     print("[*] Connecting to CognoDB Cloud...")
     driver = GraphDatabase.driver(URI, auth=(USER, PASSWORD))
@@ -488,39 +511,15 @@ def main():
         driver.close()
         sys.exit(1)
 
-    with driver.session() as session:
-        print("[*] Ensuring unique constraints...")
-        session.execute_write(create_constraints)
-
-        print(f"[*] Seeding {len(STATIONS)} All-India Stations...")
-        session.execute_write(load_stations, STATIONS)
-
-        print(f"[*] Seeding {len(LINES)} Transit Corridors...")
-        session.execute_write(load_lines, LINES)
-
-        print(f"[*] Seeding {len(LINE_STOPS)} Line-Stop Relationships...")
-        session.execute_write(load_line_stops, LINE_STOPS)
-
-        print(f"[*] Seeding {len(CONNECTIONS)} Bidirectional Connections...")
-        session.execute_write(load_connections, CONNECTIONS)
-
-        # Verification Stats
-        res = session.run(
-            """
-            MATCH (s:Station) WITH count(s) AS st
-            MATCH (l:Line)    WITH st, count(l) AS li
-            MATCH ()-[r:CONNECTED_TO]->() WITH st, li, count(r) AS co
-            RETURN st, li, co
-            """
-        ).single()
-
-        print("\n[+] All-India Graph Seed Complete!")
-        print(f"    Total Stations  : {res['st']}")
-        print(f"    Total Lines     : {res['li']}")
-        print(f"    Total Edges     : {res['co']}")
-
+    print("[*] Seeding database...")
+    stats = run_seed(driver)
+    print("\n[+] All-India Graph Seed Complete!")
+    print(f"    Total Stations  : {stats['stations']}")
+    print(f"    Total Lines     : {stats['lines']}")
+    print(f"    Total Edges     : {stats['connections']}")
     driver.close()
 
 
 if __name__ == "__main__":
     main()
+

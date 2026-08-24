@@ -55,8 +55,19 @@ def db_error_handler(e: Exception):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-#  Health
+#  Root & Health
 # ──────────────────────────────────────────────────────────────────────────────
+
+@app.get("/", tags=["General"])
+def root():
+    return {
+        "message": "🚆 BharatRoute AI / CognoDB Backend is Live and Running!",
+        "docs": "/docs",
+        "health": "/health",
+        "seed": "/seed",
+        "stations": "/stations",
+    }
+
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 def health_check():
@@ -66,6 +77,24 @@ def health_check():
         return HealthResponse(status="ok", db_connected=True, message="CognoDB connected OK")
     except Exception as e:
         return HealthResponse(status="degraded", db_connected=False, message=str(e))
+
+
+@app.get("/seed", tags=["Admin"])
+@app.post("/seed", tags=["Admin"])
+def seed_database():
+    """Seed or re-seed CognoDB with all transit lines, stations, and connections."""
+    from database import get_driver
+    from seed_data import run_seed
+    try:
+        driver = get_driver()
+        stats = run_seed(driver)
+        return {
+            "status": "success",
+            "message": "CognoDB seeded successfully!",
+            "stats": stats,
+        }
+    except Exception as e:
+        db_error_handler(e)
 
 
 # ──────────────────────────────────────────────────────────────────────────────

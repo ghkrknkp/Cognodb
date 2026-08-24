@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-COGNODB_URI = os.getenv("COGNODB_URI", "")
-COGNODB_USER = os.getenv("COGNODB_USER", "cognodb")
-COGNODB_PASSWORD = os.getenv("COGNODB_PASSWORD", "")
+COGNODB_URI = os.getenv("COGNODB_URI") or os.getenv("COGNO_URI", "")
+COGNODB_USER = os.getenv("COGNODB_USER") or os.getenv("COGNO_USER", "cognodb")
+COGNODB_PASSWORD = os.getenv("COGNODB_PASSWORD") or os.getenv("COGNO_PASSWORD", "")
 
 _driver = None
 
